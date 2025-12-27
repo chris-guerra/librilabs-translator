@@ -35,6 +35,7 @@ services:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-librilabs}:${POSTGRES_PASSWORD:-librilabs_dev}@postgres:5432/${POSTGRES_DB:-librilabs_translator}
+      TEST_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-librilabs}:${POSTGRES_PASSWORD:-librilabs_dev}@postgres-test:5432/${POSTGRES_DB:-librilabs_translator}_test
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
@@ -43,7 +44,7 @@ services:
     volumes:
       # Mount source code for hot-reload in development
       - ./backend:/app
-      # Prevent overwriting node_modules in container
+      # Prevent overwriting .venv in container
       - /app/.venv
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     healthcheck:
@@ -68,6 +69,8 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      BASE_URL: ${BASE_URL:-http://localhost:3000}
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:8000}
     depends_on:
       librilabs-translator-backend:
         condition: service_healthy
@@ -78,8 +81,33 @@ services:
       - /app/node_modules
       # Prevent overwriting .next in container
       - /app/.next
+      # Mount test results directory
+      - ./frontend/test-results:/app/test-results
+      - ./frontend/playwright-report:/app/playwright-report
     command: npm run dev
+
+  # Test database for isolated test runs
+  postgres-test:
+    image: postgres:16
+    container_name: librilabs-translator-postgres-test
+    restart: "no"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-librilabs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-librilabs_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-librilabs_translator}_test
+    ports:
+      - "${POSTGRES_TEST_PORT:-5433}:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-librilabs}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    profiles:
+      - test
 
 volumes:
   postgres_data:
+  postgres_test_data:
 

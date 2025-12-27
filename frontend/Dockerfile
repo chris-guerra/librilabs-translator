@@ -55,11 +55,29 @@ EXPOSE 3000
 # For development, this will be overridden by docker-compose.yml
 CMD ["npm", "start"]
 
-# Stage 4: Development stage (for hot-reload)
+# Stage 4: Development stage (for hot-reload and testing)
 FROM node:20-slim as development
 
 # Set working directory
 WORKDIR /app
+
+# Install system dependencies for Playwright
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libdbus-1-3 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser
@@ -69,6 +87,9 @@ COPY --chown=appuser:appuser package.json package-lock.json ./
 
 # Install dependencies (will be overridden by volume mount in dev mode)
 RUN npm ci
+
+# Install Playwright browsers (for E2E tests)
+RUN npx playwright install --with-deps chromium || true
 
 # Copy entrypoint script
 COPY --chown=appuser:appuser docker-entrypoint.sh /usr/local/bin/

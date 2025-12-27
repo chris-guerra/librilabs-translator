@@ -1,4 +1,4 @@
-.PHONY: help build up up-dev down logs logs-backend logs-frontend logs-db clean restart ps backend frontend
+.PHONY: help build up up-dev down logs logs-backend logs-frontend logs-db clean restart ps backend frontend test test-backend test-frontend test-e2e
 
 # Default target
 help:
@@ -15,9 +15,15 @@ help:
 	@echo "  make restart        - Restart all services"
 	@echo "  make ps             - Show running containers"
 	@echo ""
+	@echo "Testing Commands:"
+	@echo "  make test           - Run all tests (backend + frontend)"
+	@echo "  make test-backend   - Run backend tests only"
+	@echo "  make test-frontend  - Run frontend unit tests only"
+	@echo "  make test-e2e       - Run frontend E2E tests only"
+	@echo ""
 	@echo "Project-Specific Commands:"
-	@echo "  make backend        - Run backend commands (use: make backend help)"
-	@echo "  make frontend       - Run frontend commands (use: make frontend help)"
+	@echo "  make backend <cmd>  - Run backend commands (e.g., make backend test)"
+	@echo "  make frontend <cmd> - Run frontend commands (e.g., make frontend test)"
 
 # Build all Docker images
 build:
@@ -72,4 +78,23 @@ backend-%:
 # Usage: make frontend <command>, e.g., make frontend up-dev
 frontend-%:
 	@cd frontend && $(MAKE) $(subst frontend-,,$@)
+
+# Run all tests
+test: test-backend test-frontend
+	@echo "All tests completed!"
+
+# Run backend tests
+test-backend:
+	@echo "Running backend tests..."
+	@cd backend && $(MAKE) test
+
+# Run frontend unit tests
+test-frontend:
+	@echo "Running frontend unit tests..."
+	@cd frontend && $(MAKE) test
+
+# Run frontend E2E tests
+test-e2e:
+	@echo "Running frontend E2E tests..."
+	@cd frontend && $(MAKE) test-e2e
 

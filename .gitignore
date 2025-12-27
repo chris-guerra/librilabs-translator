@@ -208,3 +208,10 @@ __marimo__/
 
 # BMAD
 .bmad-core
+
+# Test results and reports
+test-results/
+playwright-report/
+*.coverage
+coverage/
+.pytest_cache/

@@ -55,7 +55,23 @@ ps:
 test:
 	docker compose exec frontend npm test || docker compose run --rm frontend npm test
 
+# Run unit tests in watch mode
+test-watch:
+	docker compose exec frontend npm test -- --watch || docker compose run --rm frontend npm test -- --watch
+
 # Run end-to-end tests
 test-e2e:
 	docker compose exec frontend npm run test:e2e || docker compose run --rm frontend npm run test:e2e
+
+# Run E2E tests in UI mode
+test-e2e-ui:
+	docker compose exec frontend npx playwright test --ui || docker compose run --rm -p 3000:3000 frontend npx playwright test --ui
+
+# Run E2E tests in headed mode
+test-e2e-headed:
+	docker compose exec frontend npx playwright test --headed || docker compose run --rm frontend npx playwright test --headed
+
+# Install Playwright browsers (required for E2E tests)
+test-install-browsers:
+	docker compose exec frontend npx playwright install --with-deps || docker compose run --rm frontend npx playwright install --with-deps
 

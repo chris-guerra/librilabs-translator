@@ -57,5 +57,42 @@ ps:
 
 # Run tests
 test:
+	docker compose --profile test up -d postgres-test
+	@echo "Waiting for test database to be ready..."
+	@sleep 3
 	docker compose exec backend pytest || docker compose run --rm backend pytest
+	@docker compose --profile test down postgres-test
+
+# Run tests with coverage
+test-coverage:
+	docker compose --profile test up -d postgres-test
+	@echo "Waiting for test database to be ready..."
+	@sleep 3
+	docker compose exec backend pytest --cov=app --cov-report=html --cov-report=term || docker compose run --rm backend pytest --cov=app --cov-report=html --cov-report=term
+	@docker compose --profile test down postgres-test
+
+# Run specific test file
+test-file:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Usage: make test-file FILE=tests/integration/test_routers/test_health.py"; \
+		exit 1; \
+	fi
+	docker compose --profile test up -d postgres-test
+	@echo "Waiting for test database to be ready..."
+	@sleep 3
+	docker compose exec backend pytest $(FILE) || docker compose run --rm backend pytest $(FILE)
+	@docker compose --profile test down postgres-test
+
+# Run tests in verbose mode
+test-verbose:
+	docker compose --profile test up -d postgres-test
+	@echo "Waiting for test database to be ready..."
+	@sleep 3
+	docker compose exec backend pytest -v || docker compose run --rm backend pytest -v
+	@docker compose --profile test down postgres-test
+
+# Setup test database
+test-db-setup:
+	docker compose --profile test up -d postgres-test
+	@echo "Test database is ready at localhost:5433"
 

@@ -17,6 +17,8 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      BASE_URL: ${BASE_URL:-http://localhost:3000}
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:8000}
     volumes:
       # Mount source code for hot-reload in development
       - .:/app
@@ -24,5 +26,8 @@ services:
       - /app/node_modules
       # Prevent overwriting .next in container
       - /app/.next
+      # Mount test results directory
+      - ./test-results:/app/test-results
+      - ./playwright-report:/app/playwright-report
     command: npm run dev
 

@@ -5,6 +5,7 @@ Provides FastAPI test client fixture and database test fixtures for integration 
 """
 import os
 import asyncio
+import uuid
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
@@ -14,6 +15,7 @@ from sqlalchemy import text
 from app.main import app
 from app.database import AsyncSessionLocal
 from app.models import Base
+from tests.support.factories import DocumentFactory, TranslationFactory, UserFactory
 
 
 @pytest.fixture(scope="session")
@@ -160,4 +162,61 @@ async def db_session():
             raise
         finally:
             await session.close()
+
+
+# Factory fixtures for test data creation
+@pytest.fixture
+def document_factory():
+    """Fixture providing DocumentFactory."""
+    return DocumentFactory
+
+
+@pytest.fixture
+def translation_factory():
+    """Fixture providing TranslationFactory."""
+    return TranslationFactory
+
+
+@pytest.fixture
+def user_factory():
+    """Fixture providing UserFactory."""
+    return UserFactory
+
+
+@pytest.fixture
+async def sample_document(test_db_session):
+    """
+    Create a sample document for testing.
+    
+    Auto-rolls back after test completes.
+    """
+    factory = DocumentFactory()
+    document = factory.create_document(test_db_session)
+    await test_db_session.commit()
+    await test_db_session.refresh(document)
+    return document
+
+
+@pytest.fixture
+async def sample_translation(test_db_session, sample_document):
+    """
+    Create a sample translation for testing.
+    
+    Auto-rolls back after test completes.
+    """
+    factory = TranslationFactory()
+    translation = factory.create_translation(
+        test_db_session,
+        sample_document.id,
+        {"status": "completed", "progress_percentage": 100},
+    )
+    await test_db_session.commit()
+    await test_db_session.refresh(translation)
+    return translation
+
+
+@pytest.fixture
+def unique_session_id():
+    """Generate a unique session ID for each test."""
+    return str(uuid.uuid4())
 
