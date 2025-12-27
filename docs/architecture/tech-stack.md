@@ -13,8 +13,8 @@ This is the DEFINITIVE technology selection for the entire project. All developm
 | State Management (UI) | React useState/useReducer or Zustand | Latest | Local/UI state | Minimal approach for cross-page UI state (selected document, modals). Zustand optional for complex state needs |
 | Form Handling | React Hook Form | Latest | Form management | Lightweight, TypeScript-friendly, good performance, works well with Untitled UI components |
 | CSS Framework | Tailwind CSS | Latest | Styling | Apply brand colors and typography through Tailwind configuration to match Untitled UI design system |
-| Backend Language | Python | 3.14 | Backend development | Modern Python version with latest features. FastAPI requires Python 3.8+ |
-| Backend Framework | FastAPI | Latest | REST API framework | High-performance async framework, automatic OpenAPI/Swagger documentation, type hints support, excellent for Python 3.14 |
+| Backend Language | Python | Latest stable | Backend development | Modern Python version with latest features. FastAPI requires Python 3.8+ |
+| Backend Framework | FastAPI | Latest | REST API framework | High-performance async framework, automatic OpenAPI/Swagger documentation, type hints support, excellent for latest stable Python |
 | API Style | REST | N/A | API architecture | Standard RESTful endpoints organized by resource. FastAPI provides automatic OpenAPI documentation |
 | Database | PostgreSQL | Latest (Railway managed) | Primary data store | Relational database for structured data. Railway managed provides automatic backups, connection pooling, high availability |
 | Database ORM | SQLAlchemy | 2.0 | Database abstraction | Declarative mappings with AsyncSession support. Enables async database operations with asyncpg driver |

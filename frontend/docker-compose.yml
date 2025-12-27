@@ -1,0 +1,28 @@
+# Frontend Docker Compose Configuration
+# This file allows the frontend to run independently
+# Note: Backend API should be running separately (either via root docker-compose.yml or backend/docker-compose.yml)
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: librilabs-translator-frontend
+    restart: unless-stopped
+    # Optional: Load environment variables from .env.local if it exists
+    env_file:
+      - .env.local
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    volumes:
+      # Mount source code for hot-reload in development
+      - .:/app
+      # Prevent overwriting node_modules in container
+      - /app/node_modules
+      # Prevent overwriting .next in container
+      - /app/.next
+    command: npm run dev
+

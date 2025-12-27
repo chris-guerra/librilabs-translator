@@ -1,0 +1,85 @@
+# Full-Stack Docker Compose Configuration
+# This file orchestrates all services (postgres, backend, frontend) for full-stack development
+# For independent development, use backend/docker-compose.yml or frontend/docker-compose.yml
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: librilabs-translator-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-librilabs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-librilabs_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-librilabs_translator}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-librilabs}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  librilabs-translator-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: librilabs-translator-backend
+    restart: unless-stopped
+    # Optional: Load environment variables from backend/.env if it exists
+    # For Docker Compose, environment variables below take precedence
+    env_file:
+      - ./backend/.env
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-librilabs}:${POSTGRES_PASSWORD:-librilabs_dev}@postgres:5432/${POSTGRES_DB:-librilabs_translator}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Mount source code for hot-reload in development
+      - ./backend:/app
+      # Prevent overwriting node_modules in container
+      - /app/.venv
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  librilabs-translator-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: librilabs-translator-frontend
+    restart: unless-stopped
+    # Optional: Load environment variables from frontend/.env.local if it exists
+    # For Docker Compose, environment variables below take precedence
+    env_file:
+      - ./frontend/.env.local
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    depends_on:
+      librilabs-translator-backend:
+        condition: service_healthy
+    volumes:
+      # Mount source code for hot-reload in development
+      - ./frontend:/app
+      # Prevent overwriting node_modules in container
+      - /app/node_modules
+      # Prevent overwriting .next in container
+      - /app/.next
+    command: npm run dev
+
+volumes:
+  postgres_data:
+

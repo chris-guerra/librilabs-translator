@@ -342,14 +342,36 @@ so that I can verify the backend is running and establish the foundation for API
 14. Example test demonstrates testing FastAPI endpoints (e.g., health check test)
 15. Backend test scripts are configured (pytest command works)
 
-### Story 1.2: Set Up PostgreSQL Database with SQLAlchemy and Alembic
+### Story 1.2: Set Up Docker and Deployment Configuration
+
+As a developer,  
+I want Docker containerization for both frontend and backend with a Makefile for easy development workflow,  
+so that I can deploy the application consistently across environments and develop with containerized services.
+
+**Acceptance Criteria:**
+1. Dockerfile is created for FastAPI backend with latest stable Python version
+2. Dockerfile is created for Next.js frontend (or multi-stage build)
+3. docker-compose.yml is created for local development (backend, frontend, PostgreSQL)
+4. Makefile is created with standard development commands (build, up, down, logs, clean, etc.)
+5. Makefile supports volume mounting for development mode (hot-reload for both frontend and backend)
+6. Docker images use intuitive names (e.g., `librilabs-translator-backend`, `librilabs-translator-frontend`)
+7. Environment variables are properly configured via .env files
+8. Docker containers can be built and run locally using Makefile commands
+9. Application runs successfully in Docker containers
+10. Backend health check endpoint works from containerized backend
+11. Frontend can communicate with backend API from containers
+12. Development workflow is documented (using Makefile commands)
+
+### Story 1.3: Set Up PostgreSQL Database with SQLAlchemy and Alembic
 
 As a developer,  
 I want PostgreSQL database connection with SQLAlchemy ORM and Alembic migrations configured,  
 so that I can store and manage application data with proper schema versioning.
 
+**Note:** This story assumes Docker setup from Story 1.2 is complete. Database setup will work with containerized PostgreSQL service.
+
 **Acceptance Criteria:**
-1. PostgreSQL database is accessible (Railway managed Postgres or local development instance)
+1. PostgreSQL database is accessible via Docker Compose (local development) or Railway managed Postgres (production)
 2. SQLAlchemy 2.0 is configured with asyncpg driver and AsyncSession
 3. Database connection pooling is configured
 4. Alembic is set up for database migrations
@@ -357,7 +379,7 @@ so that I can store and manage application data with proper schema versioning.
 6. Database connection can be established and tested
 7. Environment variables for database configuration are properly managed
 
-### Story 1.3: Create Document Model and Basic Persistence Layer
+### Story 1.4: Create Document Model and Basic Persistence Layer
 
 As a developer,  
 I want a document data model with persistence operations,  
@@ -375,7 +397,7 @@ so that I can store and retrieve uploaded documents in the database.
 
 **Note:** Translation entities (with target_language and translated_content) will be created in a later story/epic as separate models that reference the document.
 
-### Story 1.4: Implement Document Upload API Endpoint
+### Story 1.5: Implement Document Upload API Endpoint
 
 As a user,  
 I want to upload a TXT file through an API endpoint,  
@@ -391,7 +413,7 @@ so that I can submit my document for translation.
 7. Endpoint includes proper input validation and error handling
 8. API documentation in Swagger shows correct request/response schemas
 
-### Story 1.5: Create Document Upload UI Component
+### Story 1.6: Create Document Upload UI Component
 
 As a user,  
 I want to upload a TXT file through a web interface,  
@@ -408,7 +430,7 @@ so that I can easily submit my document for translation without using API tools.
 8. Component follows brand styling (colors, typography) via Tailwind CSS
 9. Component is accessible (keyboard navigation, screen reader support)
 
-### Story 1.6: Implement Language Selection UI and API Integration
+### Story 1.7: Implement Language Selection UI and API Integration
 
 As a user,  
 I want to select source and target languages for translation,  
@@ -424,27 +446,13 @@ so that I can specify which languages to translate between.
 7. Component follows brand styling and accessibility requirements
 8. Selected languages persist during the session/workflow
 
-### Story 1.7: Set Up Docker and Deployment Configuration
-
-As a developer,  
-I want Docker containerization for both frontend and backend,  
-so that I can deploy the application consistently across environments.
-
-**Acceptance Criteria:**
-1. Dockerfile is created for FastAPI backend with Python 3.14
-2. Dockerfile is created for Next.js frontend (or multi-stage build)
-3. docker-compose.yml is created for local development (backend, frontend, PostgreSQL)
-4. Environment variables are properly configured via .env files
-5. Docker containers can be built and run locally
-6. Application runs successfully in Docker containers
-7. Database connection works from containerized backend
-8. Frontend can communicate with backend API from containers
-
 ### Story 1.8: Configure CI/CD Pipeline
 
 As a developer,  
 I want a CI/CD pipeline for automated testing and deployment,  
 so that code changes are automatically tested and deployed to Railway.
+
+**Note:** This story depends on Docker setup from Story 1.2. Pipeline will build and deploy Docker images.
 
 **Acceptance Criteria:**
 1. CI/CD configuration is set up (GitHub Actions or Railway native)
@@ -842,7 +850,7 @@ The PRD is comprehensive and well-structured, with clear problem definition, wel
 
 **Minor Gaps:**
 - Some stories could benefit from local testability requirements (e.g., CLI testing for backend stories)
-- Story 1.6 mentions "supported language pairs (to be determined)" - should be specified before development
+- Story 1.7 mentions "supported language pairs (to be determined)" - should be specified before development
 
 **Recommendation:** No blockers. Epic/story structure is excellent. Language pairs should be specified before Epic 1 development begins.
 
@@ -1027,7 +1035,7 @@ No issues that block architect from proceeding.
 
 **For Development:**
 1. Establish local testability requirements for backend stories
-2. Set up development environment early (Epic 1, Story 1.1)
+2. Set up development environment early (Epic 1, Story 1.1) and Docker containerization (Story 1.2)
 3. Plan for technical debt (synchronized scrolling, paragraph alignment)
 
 ### Final Decision

@@ -9,7 +9,7 @@ Development setup and workflow for the fullstack application.
 ```bash
 # Required software
 - Node.js 18+ and npm
-- Python 3.14
+- Python (latest stable version)
 - Docker and Docker Compose
 - Git
 ```
@@ -55,8 +55,11 @@ cp backend/.env.example backend/.env
 # 4. Mock mode allows full workflow testing without API costs or rate limits
 # 5. Production deployments must have USE_MOCK_OPENAI=false or unset (enforced by environment check)
 
-# Start all services with Docker Compose
-docker-compose up -d
+# Start all services with Docker Compose (using Makefile)
+make up-dev
+
+# Or using Docker Compose directly:
+# docker-compose up -d
 
 # Or start services individually:
 # Backend: cd backend && uvicorn app.main:app --reload
@@ -66,6 +69,39 @@ docker-compose up -d
 
 ### Development Commands
 
+**Using Makefile (Recommended):**
+```bash
+# Build all Docker images
+make build
+
+# Start all services in development mode (with hot-reload)
+make up-dev
+
+# Start all services in detached mode
+make up
+
+# Stop all services
+make down
+
+# View logs from all services
+make logs
+
+# View logs from specific service
+make logs-backend
+make logs-frontend
+make logs-db
+
+# Restart all services
+make restart
+
+# Show running containers
+make ps
+
+# Clean up (remove containers, volumes, and images)
+make clean
+```
+
+**Using npm scripts:**
 ```bash
 # Start all services
 npm run dev
@@ -81,8 +117,14 @@ npm run test
 
 # Run linting
 npm run lint
+```
 
-# Run database migrations
+**Database Migrations:**
+```bash
+# Run database migrations (from within backend container or locally)
+make exec-backend alembic upgrade head
+
+# Or if running locally:
 cd backend && alembic upgrade head
 
 # Create new migration
@@ -98,7 +140,10 @@ cd backend && alembic revision --autogenerate -m "description"
 NEXT_PUBLIC_API_URL=http://localhost:8000
 
 # Backend (.env)
-DATABASE_URL=postgresql+asyncpg://librilabs:librilabs_dev@localhost:5432/librilabs_translator
+# For Docker Compose (local development):
+DATABASE_URL=postgresql+asyncpg://librilabs:librilabs_dev@postgres:5432/librilabs_translator
+# For local PostgreSQL (without Docker):
+# DATABASE_URL=postgresql+asyncpg://librilabs:librilabs_dev@localhost:5432/librilabs_translator
 OPENAI_API_KEY=sk-...
 RESEND_API_KEY=re_...  # Post-MVP
 JWT_SECRET=...  # Post-MVP

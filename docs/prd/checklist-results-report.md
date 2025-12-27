@@ -114,7 +114,7 @@ The PRD is comprehensive and well-structured, with clear problem definition, wel
 
 **Minor Gaps:**
 - Some stories could benefit from local testability requirements (e.g., CLI testing for backend stories)
-- Story 1.6 mentions "supported language pairs (to be determined)" - should be specified before development
+- Story 1.7 mentions "supported language pairs (to be determined)" - should be specified before development
 
 **Recommendation:** No blockers. Epic/story structure is excellent. Language pairs should be specified before Epic 1 development begins.
 
