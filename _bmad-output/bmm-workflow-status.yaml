@@ -1,0 +1,139 @@
+# Workflow Status - Librilabs Translator
+# This tracks progress through BMM methodology Analysis, Planning, and Solutioning phases.
+# Implementation phase is tracked separately in sprint-status.yaml
+
+# STATUS DEFINITIONS:
+# ==================
+# Initial Status (before completion):
+#   - required: Must be completed to progress
+#   - optional: Can be completed but not required
+#   - recommended: Strongly suggested but not required
+#   - conditional: Required only if certain conditions met (e.g., if_has_ui)
+#
+# Completion Status:
+#   - {file-path}: File created/found (e.g., "docs/product-brief.md")
+#   - skipped: Optional/conditional workflow that was skipped
+
+generated: "2025-12-27T19:41:56Z"
+project: "librilabs-translator"
+project_type: "brownfield"
+selected_track: "bmad-method"
+field_type: "brownfield"
+workflow_path: "_bmad/bmm/workflows/workflow-status/paths/method-brownfield.yaml"
+workflow_status:
+  # Prerequisite Phase (if undocumented)
+  - phase: "prerequisite"
+    name: "Documentation"
+    conditional: "if_undocumented"
+    note: "NOT a phase - prerequisite for brownfield without docs"
+    workflows:
+      - id: "document-project"
+        status: "skipped"
+        required: true
+        agent: "analyst"
+        command: "document-project"
+        output: "Comprehensive project documentation"
+        purpose: "Understand existing codebase before planning"
+        note: "Skipped - comprehensive documentation already exists in docs/"
+
+  # Phase 0: Discovery (Optional)
+  - phase: 0
+    name: "Discovery (Optional)"
+    optional: true
+    note: "User-selected during workflow-init"
+    workflows:
+      - id: "brainstorm-project"
+        status: "docs/brainstorming-session-results.md"
+        optional: true
+        agent: "analyst"
+        command: "brainstorm-project"
+        included_by: "user_choice"
+        note: "Uses core brainstorming workflow with project context template"
+
+      - id: "research"
+        status: "docs/market-research.md"
+        optional: true
+        agent: "analyst"
+        command: "research"
+        included_by: "user_choice"
+
+      - id: "product-brief"
+        status: "docs/brief.md"
+        optional: true
+        agent: "analyst"
+        command: "product-brief"
+        included_by: "user_choice"
+        note: "Optional for brownfield, less common than greenfield"
+
+  # Phase 1: Planning
+  - phase: 1
+    name: "Planning"
+    required: true
+    workflows:
+      - id: "prd"
+        status: "docs/prd/"
+        required: true
+        agent: "pm"
+        command: "prd"
+        output: "PRD focused on new features/changes"
+        note: "Must consider existing system constraints"
+
+      - id: "create-ux-design"
+        status: "docs/front-end-spec.md"
+        conditional: "if_has_ui"
+        agent: "ux-designer"
+        command: "create-ux-design"
+
+  # Phase 2: Solutioning
+  - phase: 2
+    name: "Solutioning"
+    required: true
+    workflows:
+      - id: "create-architecture"
+        status: "docs/architecture/"
+        recommended: true
+        agent: "architect"
+        command: "create-architecture"
+        output: "Integration architecture - solution design for THIS project"
+        note: "HIGHLY RECOMMENDED: Distills massive brownfield context into focused solution design. Prevents agent confusion."
+
+      - id: "create-epics-and-stories"
+        status: "docs/prd/epic-*.md"
+        required: true
+        agent: "pm"
+        command: "create-epics-and-stories"
+        note: "Required: Break down PRD into implementable epics and stories with full context (PRD + UX + Architecture)"
+
+      - id: "test-design"
+        status: "required"
+        recommended: true
+        agent: "tea"
+        command: "test-design"
+        output: "System-level testability review"
+        note: "Testability assessment before gate check - auto-detects system-level mode"
+
+      - id: "validate-architecture"
+        status: "skipped"
+        optional: true
+        agent: "architect"
+        command: "validate-architecture"
+
+      - id: "implementation-readiness"
+        status: "required"
+        required: true
+        agent: "architect"
+        command: "implementation-readiness"
+        note: "Validates PRD + Architecture + Epics + UX (optional)"
+
+  # Phase 3: Implementation
+  - phase: 3
+    name: "Implementation"
+    required: true
+    workflows:
+      - id: "sprint-planning"
+        status: "required"
+        required: true
+        agent: "sm"
+        command: "sprint-planning"
+        note: "Creates sprint plan with stories"
+

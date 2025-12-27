@@ -371,20 +371,23 @@ For production, consider:
 
 ### BMad Method
 
-This project uses [BMad Method](https://github.com/bmad-method/bmad-method) (v4.44.3) - a universal AI agent framework for project management and documentation.
+This project uses [BMad Method](https://github.com/bmad-method/bmad-method) (v6.0.0-alpha.21) - a universal AI agent framework for project management and documentation.
 
 **Installation:**
 ```bash
-npx bmad-method install
+npx bmad-method@alpha install
 ```
 
 **Configuration:**
 - PRD (Product Requirements Document) is sharded into multiple files
 - Architecture documentation is sharded into multiple files
-- No IDE integration configured (can be added manually if needed)
+- Cursor IDE integration configured
 
 **Documentation:**
-- User guide: `.bmad-core/user-guide.md`
-- Framework files: `.bmad-core/` directory
+- Framework files: `_bmad/` directory (v6 structure)
+- User guide: `_bmad/bmm/docs/index.md`
+- Quick start: `_bmad/bmm/docs/quick-start.md`
 
-For more information about the BMad workflow and how to use the agents effectively, refer to the user guide.
+**Note:** `.bmad-core/` is from v4 and is not used in v6. All framework files are in `_bmad/`.
+
+For more information about the BMad workflow and how to use the agents effectively, refer to the documentation in `_bmad/bmm/docs/`.

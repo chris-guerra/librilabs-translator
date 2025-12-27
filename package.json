@@ -1,0 +1,9 @@
+{
+  "name": "librilabs-translator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "install:bmad": "npx bmad-method install"
+  }
+}
+
